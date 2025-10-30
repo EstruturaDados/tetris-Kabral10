@@ -4,9 +4,99 @@
 // Tema 3 - Integração de Fila e Pilha
 // Este código inicial serve como base para o desenvolvimento do sistema de controle de peças.
 // Use as instruções de cada nível para desenvolver o desafio.
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdbool.h>
+
+#define TAM 5 // tamanho fixo da fila
+
+//Struct peça
+typedef struct {
+    char tipo;
+    int id;
+} Peca;
+
+//Variaveis globais da fila
+Peca fila[TAM];
+int inicio = 0, fim = 0, qtd = 0;
+int contadorID = 1; // ID sequencial
+
+//Funções da fila
+bool filaVazia() {
+    return qtd == 0;
+}
+
+bool filaCheia() {
+    return qtd == TAM;
+}
+
+void enqueue(Peca nova) {
+    if(filaCheia()) return;
+
+    fila[fim] = nova;
+    fim = (fim + 1) % TAM;
+    qtd++;
+}
+
+Peca dequeue() {
+    Peca removida = fila[inicio];
+    inicio = (inicio + 1) % TAM;
+    qtd--;
+    return removida;
+}
+
+//Função gerarpeca
+Peca gerarPeca() {
+    char tipos[] = {'I', 'O', 'T', 'L'};
+    Peca nova;
+    nova.tipo = tipos[rand() % 4];
+    nova.id = contadorID++;
+    return nova;
+}
+
+//Mostrar fila
+void mostrarFila() {
+    printf("\nPeças futuras:\n");
+    for(int i = 0; i < qtd; i++) {
+        int idx = (inicio + i) % TAM;
+        printf("[%d] %c (id %d)\n", i, fila[idx].tipo, fila[idx].id);
+    }
+}
+
+//Iniciar fila
+void inicializarFila() {
+    for(int i = 0; i < TAM; i++) {
+        enqueue(gerarPeca());
+    }
+}
 
 int main() {
 
+    srand(time(NULL));
+
+    inicializarFila();
+    
+    int opcao;
+    do {
+        mostrarFila();
+        printf("\nMenu:\n");
+        printf("1 - Jogar peça (remover da fila)\n");
+        printf("0 - Sair\n");
+        printf("Escolha: ");
+        scanf("%d", &opcao);
+
+        if(opcao == 1) {
+            if(!filaVazia()) {
+                Peca p = dequeue();
+                printf("\nVocê jogou a peça: %c (id %d)\n", p.tipo, p.id);
+
+                // sempre gera nova peça para o final
+                enqueue(gerarPeca());
+            }
+        }
+
+    } while(opcao != 0);
     // 🧩 Nível Novato: Fila de Peças Futuras
     //
     // - Crie uma struct Peca com os campos: tipo (char) e id (int).
